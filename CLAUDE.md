@@ -9,7 +9,9 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 ```bash
 forge build
 forge test -vvv                                           # all tests
-forge test --match-test test_Revert_WhenPriceZero -vvv   # single test
+forge coverage --no-match-coverage "script|test"          # coverage of src/ (CI gate: 95% lines)
+forge snapshot --check                                    # gas regression check
+forge test --match-test test_listNFT_withZeroPrice -vvv   # single test
 forge fmt                                                 # format (CI enforces this)
 forge script script/DeployLocal.s.sol --rpc-url http://127.0.0.1:8545 --broadcast
 ```
@@ -37,9 +39,9 @@ Monorepo with two independent packages — `contracts/` and `frontend/` — no s
 
 Single contract: `NFTMarketplace.sol`. No upgradability, no fees, no escrow. Core invariant: ETH and NFT transfer atomically in `buyNFT` — delete listing, then `safeTransferFrom`, then `seller.call{value}`.
 
-Active listing enumeration uses a swap-and-pop array (`activeListings`) with a `_indexOf` mapping (stores `index + 1`, zero = not present). This lets `getActiveListings()` return all listings in one call — intentional for this learning project, not production-grade.
+Active listing enumeration uses a swap-and-pop array (`activeListings`) with a `_indexOf` mapping (stores `index + 1`, zero = not present). This lets `getActiveListings()` return all listings in one call — intentional for this learning project, not production-grade. `getActiveListingsPage(offset, limit)` is the bounded alternative. Re-listing an already listed token overwrites its existing entry in place (never pushes a duplicate).
 
-`MockNFT` has an open `mint` — only for local dev, never deploy to mainnet.
+`MockNFT` lives in `contracts/test/mocks/` (not in `src/`) and has an open `mint` — only for local dev, never deploy to mainnet. Attacker mocks (reentrant buyer/seller, non-payable seller) are in `test/mocks/Actors.sol`.
 
 Deploy script (`DeployLocal.s.sol`) mints tokens 0,1,2 to Anvil account #0. On a fresh anvil the deployed addresses match the hardcoded defaults in `frontend/src/config/contracts.ts`, so `.env.local` is usually not needed.
 
@@ -58,4 +60,8 @@ Contract addresses are read from `NEXT_PUBLIC_MARKETPLACE_ADDRESS` / `NEXT_PUBLI
 
 ### CI (`.github/workflows/test.yml`)
 
-Runs only the Foundry suite: `forge fmt --check`, `forge build --sizes`, `forge test -vvv`. No frontend CI.
+Runs only the Foundry suite: `forge fmt --check`, `forge build --sizes`, `forge test` (profile `ci`), a 95% line-coverage gate on `src/`, `forge snapshot --check` and Slither. No frontend CI. Update `contracts/.gas-snapshot` with `forge snapshot` after intentional gas changes.
+
+### Conventions
+
+Tests are named `test_<function>_<scenario>_<result>` with `// Arrange`, `// Act`, `// Assert` blocks. Custom errors only, with parameters where useful. When the contract ABI changes, update `frontend/src/abi/nftMarketplace.ts` by hand.
