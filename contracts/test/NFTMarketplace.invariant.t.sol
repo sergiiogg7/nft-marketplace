@@ -2,7 +2,7 @@
 pragma solidity 0.8.24;
 
 import "forge-std/Test.sol";
-import {MockNFT} from "../src/MockNFT.sol";
+import {MockNFT} from "./mocks/MockNFT.sol";
 import {NFTMarketplace} from "../src/NFTMarketplace.sol";
 
 /// @notice Drives random list/buy/cancel calls against the marketplace.

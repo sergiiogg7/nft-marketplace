@@ -3,7 +3,7 @@ pragma solidity 0.8.24;
 
 import {Script, console} from "forge-std/Script.sol";
 import {NFTMarketplace} from "../src/NFTMarketplace.sol";
-import {MockNFT} from "../src/MockNFT.sol";
+import {MockNFT} from "../test/mocks/MockNFT.sol";
 
 /// @notice Local deploy: marketplace + a demo NFT collection with a few minted tokens.
 /// @dev Uses Anvil account #0 by default; override with `PRIVATE_KEY` env var.

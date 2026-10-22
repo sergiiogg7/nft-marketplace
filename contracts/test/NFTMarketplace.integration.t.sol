@@ -2,7 +2,7 @@
 pragma solidity 0.8.24;
 
 import "forge-std/Test.sol";
-import {MockNFT} from "../src/MockNFT.sol";
+import {MockNFT} from "./mocks/MockNFT.sol";
 import {NFTMarketplace} from "../src/NFTMarketplace.sol";
 
 /// @notice End-to-end scenarios exercising list -> buy -> cancel across multiple actors.

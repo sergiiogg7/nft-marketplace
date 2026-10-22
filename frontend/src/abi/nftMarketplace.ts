@@ -87,11 +87,19 @@ export const nftMarketplaceAbi = [
       { name: "tokenId", type: "uint256", indexed: true },
     ],
   },
+  { type: "error", name: "ZeroAddress", inputs: [] },
   { type: "error", name: "ZeroPrice", inputs: [] },
   { type: "error", name: "NotOwner", inputs: [] },
   { type: "error", name: "NotApproved", inputs: [] },
   { type: "error", name: "ListingNotFound", inputs: [] },
-  { type: "error", name: "WrongPrice", inputs: [] },
+  {
+    type: "error",
+    name: "WrongPrice",
+    inputs: [
+      { name: "expected", type: "uint256" },
+      { name: "provided", type: "uint256" },
+    ],
+  },
   { type: "error", name: "NotSeller", inputs: [] },
   { type: "error", name: "PaymentFailed", inputs: [] },
 ] as const;

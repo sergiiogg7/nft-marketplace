@@ -2,7 +2,7 @@
 pragma solidity 0.8.24;
 
 import "forge-std/Test.sol";
-import {MockNFT} from "../src/MockNFT.sol";
+import {MockNFT} from "./mocks/MockNFT.sol";
 import {NFTMarketplace} from "../src/NFTMarketplace.sol";
 
 contract NFTMarketplaceTest is Test {
@@ -119,7 +119,7 @@ contract NFTMarketplaceTest is Test {
 
         vm.deal(buyer, PRICE);
         vm.prank(buyer);
-        vm.expectRevert(NFTMarketplace.WrongPrice.selector);
+        vm.expectRevert(abi.encodeWithSelector(NFTMarketplace.WrongPrice.selector, PRICE, PRICE - 1));
         marketplace.buyNFT{value: PRICE - 1}(address(nft), TOKEN_ID);
     }
 
