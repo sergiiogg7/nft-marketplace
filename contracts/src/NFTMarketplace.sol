@@ -181,9 +181,9 @@ contract NFTMarketplace is ReentrancyGuard {
     }
 
     /// @dev Swap-and-pop removal that keeps `_indexOf` in sync for the moved element.
+    ///      Only called for tokens with an active listing, which always have a non-zero `_indexOf`.
     function _removeFromActive(address nftAddress_, uint256 tokenId_) private {
         uint256 indexPlusOne = _indexOf[nftAddress_][tokenId_];
-        if (indexPlusOne == 0) return;
         uint256 index = indexPlusOne - 1;
         uint256 lastIndex = activeListings.length - 1;
 
