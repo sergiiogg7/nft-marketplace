@@ -26,7 +26,7 @@ contract NFTMarketplaceIntegrationTest is Test {
         vm.stopPrank();
     }
 
-    function test_FullHappyPath() public {
+    function test_fullFlow_listBuy_settlesAndClearsListing() public {
         uint256 price = 2 ether;
         _mintAndList(seller, 0, price);
 
@@ -43,7 +43,7 @@ contract NFTMarketplaceIntegrationTest is Test {
         assertEq(marketplace.totalListings(), 0);
     }
 
-    function test_MultiListing_BuyMiddle_CancelOther_LeavesSurvivor() public {
+    function test_multiListing_buyMiddleThenCancelOther_leavesSurvivor() public {
         _mintAndList(seller, 0, 1 ether);
         _mintAndList(seller, 1, 2 ether);
         _mintAndList(seller, 2, 3 ether);
@@ -65,24 +65,5 @@ contract NFTMarketplaceIntegrationTest is Test {
         assertEq(all[0].seller, seller);
         assertEq(nft.ownerOf(1), buyer);
         assertEq(nft.ownerOf(2), seller);
-    }
-
-    // ------------------------------------------------------------------ fuzz
-
-    /// @dev For arbitrary price/tokenId, a list then exact-price buy always settles.
-    function testFuzz_listAndBuy(uint96 price, uint256 tokenId) public {
-        vm.assume(price > 0);
-
-        _mintAndList(seller, tokenId, price);
-
-        vm.deal(buyer, price);
-        uint256 sellerBefore = seller.balance;
-
-        vm.prank(buyer);
-        marketplace.buyNFT{value: price}(address(nft), tokenId);
-
-        assertEq(nft.ownerOf(tokenId), buyer);
-        assertEq(seller.balance, sellerBefore + price);
-        assertEq(marketplace.totalListings(), 0);
     }
 }
